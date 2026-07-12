@@ -33,8 +33,7 @@ def pricevalue_phone():
 
 def test_calc_valuescore(default_phone):
     actual = Analyzer.calc_valuescore(table = default_phone)
-    # Пересчитать
-    expected = 0.6585
+    expected = 0.6035
 
     assert actual == pytest.approx(expected, abs = 1e-6)
 
