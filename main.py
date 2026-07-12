@@ -10,4 +10,3 @@ if __name__ == '__main__':
     # Visualize
     table = analyzer.get_main_table()
     visualizer = Visualizer(table = table)
-    # visualizer.create_boxplot_brands()
