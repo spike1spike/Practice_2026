@@ -117,9 +117,23 @@ class Analyzer:
     
     def get_avg_price_by_column(self, column_name):
         avg = self.table.groupby(column_name)['price'].mean().reset_index(name = 'average_price')
-
         return avg
     
-    def save(self, table):
+    @staticmethod
+    def filter_by_columns(table, filter_settings):
+        for col, sign, value in filter_settings:
+            match sign:
+                case '>':
+                    table = table[table[col] > value]
+                case '>=':
+                    table = table[table[col] >= value]
+                case '<':
+                    table = table[table[col] < value]
+                case '<=':
+                    table = table[table[col] <= value]
+        
+        return table
+
+    def save_main(self):
         columns = self.original_columns + ['price_value']
-        table[columns].to_csv(Path('csv') / 'result.csv', index = False)
+        self.table[columns].to_csv(Path('csv') / 'result.csv', index = False)

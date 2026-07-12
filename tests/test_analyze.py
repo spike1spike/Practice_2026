@@ -29,6 +29,11 @@ def pricevalue_phone():
             'value_score': 0.65
         }
 
+@pytest.fixture
+def phones_table():
+    analyzer = Analyzer()
+    return analyzer.get_main_table()
+
 # Tests
 
 def test_calc_valuescore(default_phone):
@@ -43,7 +48,7 @@ def test_calc_pricevalue(pricevalue_phone):
     
     assert actual == pytest.approx(expected, abs = 1e-6)
 
-@pytest.mark.parametrize('column, smaller_value, greater_value', [
+@pytest.mark.parametrize('col, smaller_value, greater_value', [
     ('rating_normalized', 0.5, 0.6),
     ('has_5g', 0, 1),
     ('has_nfc', 0, 1),
@@ -59,14 +64,31 @@ def test_calc_pricevalue(pricevalue_phone):
     ('extended_upto_normalized', 0.75, 0.85),
     ('ppi_normalized', 0.9, 1)
 ])
-def test_change_valuescore(default_phone, column, smaller_value, greater_value):
+def test_change_valuescore(default_phone, col, smaller_value, greater_value):
     phone_a = default_phone.copy()
     phone_b = default_phone.copy()
 
-    phone_a[column] = smaller_value
-    phone_b[column] = greater_value
+    phone_a[col] = smaller_value
+    phone_b[col] = greater_value
 
     value_a = Analyzer.calc_valuescore(table = phone_a)
     value_b = Analyzer.calc_valuescore(table = phone_b)
 
     assert value_a < value_b
+
+@pytest.mark.parametrize('col, value', [
+    ('price', 30_000),
+    ('rating', 75),
+    ('processor_speed', 2.5),
+    ('battery_capacity', 4500),
+    ('fast_charging', 50),
+    ('ram_capacity', 8),
+    ('internal_memory', 256),
+    ('refresh_rate', 90),
+    ('primary_camera_rear', 50),
+    ('primary_camera_front', 16),
+    ('extended_upto', 1024)
+])
+def test_filter_by_columns(phones_table, col, value):
+    phones_table = Analyzer.filter_by_columns(table = phones_table, filter_settings = [(col, '<', value)])
+    assert phones_table[col].max() < value
