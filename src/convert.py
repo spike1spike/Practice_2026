@@ -9,9 +9,9 @@ class Converter:
 
         self.table = pd.read_csv(Path('csv') / 'database_original.csv')
         for column in columns_to_int:
-            self.table[column] = self.table[column].apply(self.to_int).astype('Int64')
+            self.table[column] = self.table[column].apply(Converter.to_int).astype('Int64')
         for column in columns_to_bool:
-            self.table[column] = self.table[column].apply(self.to_bool)
+            self.table[column] = self.table[column].apply(Converter.to_bool)
     
     @staticmethod
     def to_int(value):
