@@ -26,7 +26,6 @@ class Analyzer:
     
     def analyze(self):
         self.insert_ppi()
-        self.insert_price_per_unit()
         self.fill_null()
         self.bool_to_int()
         self.normalize()
@@ -37,11 +36,6 @@ class Analyzer:
         self.table['resolution_height'] = self.table['resolution'].str[1]
         screen_size_pixels = np.sqrt(self.table['resolution_width']**2 + self.table['resolution_height']**2)
         self.table['ppi'] = screen_size_pixels / self.table['screen_size']
-
-    def insert_price_per_unit(self):
-        self.table['price_per_battery'] = self.table['price'] / self.table['battery_capacity']
-        self.table['price_per_ram'] = self.table['price'] / self.table['ram_capacity']
-        self.table['price_per_camera'] = self.table['price'] / self.table['primary_camera_rear']
 
     def fill_null(self):
         fill_zero = ['has_5g', 'has_nfc', 'has_ir_blaster', 'fast_charging', 'extended_upto']
@@ -103,7 +97,7 @@ class Analyzer:
         return price_value
     
     @staticmethod
-    def filter_by_columns(table, filter_settings):
+    def filter(table, filter_settings):
         for col, sign, value in filter_settings:
             match sign:
                 case '>':
@@ -117,7 +111,10 @@ class Analyzer:
         
         return table
 
-    def save_main(self, sorted = 'descending'):
+    def save_main(self, filter_settings = None, sorted = 'descending'):
+        if filter_settings:
+            self.table = Analyzer.filter(table = self.table, filter_settings = filter_settings)
+        
         if sorted == 'ascending':
             self.table.sort_values('price_value', ascending = True, inplace = True)
         elif sorted == 'descending':
@@ -128,8 +125,13 @@ class Analyzer:
     
     def save_aggregation(self, column):
         aggregated = self.table.groupby('brand_name')[column].agg(['size', 'min', 'max', 'mean', 'median'])
-        aggregated['mean'] = aggregated['mean'].round(2)
+        aggregated = aggregated.round(2)
         aggregated.to_csv(Path('csv') / 'result_aggregation.csv', index = True)
+
+    def save_statistics(self, column):
+        statistics = self.table[column].describe()
+        statistics = statistics.round(2)
+        statistics.to_csv(Path('csv') / 'result_statistics.csv', index = True)
 
     def save_correlation(self):
         corr_cols = ['price', 'battery_capacity', 'ram_capacity', 'internal_memory',

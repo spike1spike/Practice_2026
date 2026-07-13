@@ -89,6 +89,6 @@ def test_change_valuescore(default_phone, col, smaller_value, greater_value):
     ('primary_camera_front', 16),
     ('extended_upto', 1024)
 ])
-def test_filter_by_columns(phones_table, col, value):
-    phones_table = Analyzer.filter_by_columns(table = phones_table, filter_settings = [(col, '<', value)])
+def test_filter(phones_table, col, value):
+    phones_table = Analyzer.filter(table = phones_table, filter_settings = [(col, '<', value)])
     assert phones_table[col].max() < value
