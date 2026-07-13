@@ -7,6 +7,8 @@ from pathlib import Path
 class Analyzer:
     # How much should price affect the final rating | range = [0, 1]
     price_weight = 0.25
+    # Methods `save_*` will save csv files to `save_folder`
+    save_folder = Path('csv') / 'results'
 
     def __init__(self):
         self.engine = create_engine(f'postgresql+psycopg://postgres:1qaz2wsx@localhost:5432/smartphones')
@@ -121,17 +123,17 @@ class Analyzer:
             self.table.sort_values('price_value', ascending = False, inplace = True)
         
         columns = self.original_columns + ['price_value']
-        self.table[columns].to_csv(Path('csv') / 'result_main.csv', index = False)
+        self.table[columns].to_csv(Analyzer.save_folder / 'main.csv', index = False)
     
     def save_aggregation(self, column):
         aggregated = self.table.groupby('brand_name')[column].agg(['size', 'min', 'max', 'mean', 'median'])
         aggregated = aggregated.round(2)
-        aggregated.to_csv(Path('csv') / 'result_aggregation.csv', index = True)
+        aggregated.to_csv(Analyzer.save_folder / 'aggregation.csv', index = True)
 
     def save_statistics(self, column):
         statistics = self.table[column].describe()
         statistics = statistics.round(2)
-        statistics.to_csv(Path('csv') / 'result_statistics.csv', index = True)
+        statistics.to_csv(Analyzer.save_folder / 'statistics.csv', index = True)
 
     def save_correlation(self):
         corr_cols = ['price', 'battery_capacity', 'ram_capacity', 'internal_memory',
@@ -140,4 +142,4 @@ class Analyzer:
         corr = self.table[corr_cols].corr()
         corr_price = corr['price'].sort_values(ascending = False).round(2)
 
-        corr_price.to_csv(Path('csv') / 'result_correlation.csv', index = True)
+        corr_price.to_csv(Analyzer.save_folder / 'correlation.csv', index = True)
