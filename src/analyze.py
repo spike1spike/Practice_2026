@@ -22,6 +22,8 @@ class Analyzer:
                                  ''',
                                  self.engine)
         self.original_columns = self.table.columns.to_list()
+
+        self.analyze()
     
     def get_main(self):
         return self.table
