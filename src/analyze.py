@@ -104,6 +104,8 @@ class Analyzer:
     def filter(table, filter_settings):
         for col, sign, value in filter_settings:
             match sign:
+                case '=':
+                    table = table[table[col] == value]
                 case '>':
                     table = table[table[col] > value]
                 case '>=':
