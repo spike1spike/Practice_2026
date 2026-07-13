@@ -6,7 +6,9 @@ if __name__ == '__main__':
     analyzer = Analyzer()
     analyzer.analyze()
     analyzer.save_main()
+    analyzer.save_aggregation(column = 'price')
+    analyzer.save_correlation()
 
     # Visualize
-    table = analyzer.get_main_table()
+    table = analyzer.get_main()
     visualizer = Visualizer(table = table)

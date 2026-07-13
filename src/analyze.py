@@ -20,7 +20,10 @@ class Analyzer:
                                  ''',
                                  self.engine)
         self.original_columns = self.table.columns.to_list()
-
+    
+    def get_main(self):
+        return self.table
+    
     def analyze(self):
         self.insert_ppi()
         self.insert_price_per_unit()
@@ -28,8 +31,7 @@ class Analyzer:
         self.bool_to_int()
         self.normalize()
         self.insert_overall_score()
-        self.sort_by_pricevalue()
-    
+
     def insert_ppi(self):
         self.table['resolution_width'] = self.table['resolution'].str[0]
         self.table['resolution_height'] = self.table['resolution'].str[1]
@@ -99,25 +101,6 @@ class Analyzer:
         price_value = round(price_value, 2)
 
         return price_value
-
-    def sort_by_pricevalue(self):
-        self.table.sort_values('price_value', ascending = False, inplace = True)
-
-    def get_main_table(self):
-        return self.table
-
-    def get_correlation(self):
-        corr_cols = ['price', 'battery_capacity', 'ram_capacity', 'internal_memory',
-                     'num_rear_cameras', 'num_front_cameras', 'primary_camera_rear',
-                     'primary_camera_front']
-        corr = self.table[corr_cols].corr()
-        corr_price = corr['price'].sort_values(ascending = False)
-
-        return corr_price
-    
-    def get_avg_price_by_column(self, column_name):
-        avg = self.table.groupby(column_name)['price'].mean().reset_index(name = 'average_price')
-        return avg
     
     @staticmethod
     def filter_by_columns(table, filter_settings):
@@ -134,6 +117,25 @@ class Analyzer:
         
         return table
 
-    def save_main(self):
+    def save_main(self, sorted = 'descending'):
+        if sorted == 'ascending':
+            self.table.sort_values('price_value', ascending = True, inplace = True)
+        elif sorted == 'descending':
+            self.table.sort_values('price_value', ascending = False, inplace = True)
+        
         columns = self.original_columns + ['price_value']
-        self.table[columns].to_csv(Path('csv') / 'result.csv', index = False)
+        self.table[columns].to_csv(Path('csv') / 'result_main.csv', index = False)
+    
+    def save_aggregation(self, column):
+        aggregated = self.table.groupby('brand_name')[column].agg(['size', 'min', 'max', 'mean', 'median'])
+        aggregated['mean'] = aggregated['mean'].round(2)
+        aggregated.to_csv(Path('csv') / 'result_aggregation.csv', index = True)
+
+    def save_correlation(self):
+        corr_cols = ['price', 'battery_capacity', 'ram_capacity', 'internal_memory',
+                     'num_rear_cameras', 'num_front_cameras', 'primary_camera_rear',
+                     'primary_camera_front']
+        corr = self.table[corr_cols].corr()
+        corr_price = corr['price'].sort_values(ascending = False).round(2)
+
+        corr_price.to_csv(Path('csv') / 'result_correlation.csv', index = True)
