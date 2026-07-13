@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 
 class Converter:
     def __init__(self):
@@ -31,7 +32,7 @@ class Converter:
             raise ValueError('UNABLE TO CONVERT A VALUE')
     
     def save(self):
-        self.table.to_csv('database_edited.csv', index = False)
+        self.table.to_csv(Path('csv') / 'database_edited.csv', index = False)
 
 if __name__ == '__main__':
     converter = Converter()
