@@ -7,7 +7,7 @@ class Converter:
                           'internal_memory', 'num_front_cameras', 'extended_upto']
         columns_to_bool = ['fast_charging_available', 'extended_memory_available']
 
-        self.table = pd.read_csv('database_original.csv')
+        self.table = pd.read_csv(Path('csv') / 'database_original.csv')
         for column in columns_to_int:
             self.table[column] = self.table[column].apply(self.to_int).astype('Int64')
         for column in columns_to_bool:
