@@ -32,7 +32,7 @@ def pricevalue_phone():
 @pytest.fixture
 def phones_table():
     analyzer = Analyzer()
-    return analyzer.get_main_table()
+    return analyzer.get_main()
 
 # Tests
 
