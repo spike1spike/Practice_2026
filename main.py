@@ -12,3 +12,4 @@ if __name__ == '__main__':
     # Visualize
     table = analyzer.get_main()
     visualizer = Visualizer(table = table)
+    visualizer.create_pairplot_all()

@@ -21,12 +21,11 @@ class Visualizer:
             'value_score',
         ]
 
-        graph = sns.pairplot(self.table,
-                             vars = features,
-                             hue = 'top_brand_name',
-                             diag_kind = 'hist')
-        for y, x in zip(*np.triu_indices_from(graph.axes, 1)):
-            graph.axes[y, x].set_visible(False)
+        sns.pairplot(self.table,
+                     vars = features,
+                     hue = 'top_brand_name',
+                     diag_kind = 'hist',
+                     corner = True)
         plt.show()
     
     def create_scatter_ramcapacity(self):
